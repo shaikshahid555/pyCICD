@@ -1,37 +1,37 @@
+
 pipeline {
-  agent any
-  stages {
-    stage('Checkout') {
-      steps {
-        git branch: 'main',
-          url: 'https://github.com/shaikshahid555/pyCICD.git'
-      }
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Source code checked out successfully'
+            }
+        }
+
+        stage('Verify Python') {
+            steps {
+                bat 'python --version'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'python -m unittest -v'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'python -m pip install --user setuptools'
+                bat 'python setup.py sdist'
+
+                archiveArtifacts artifacts: 'dist/*',
+                                 fingerprint: true
+
+                echo 'Python package created successfully!'
+            }
+        }
     }
-    stage('Verify Python') {
-      steps {
-        bat 'python --version'
-      }
-    }
-    stage('Test') {
-      steps {
-        bat 'python -m unittest -v'
-      }
-    }
-    stage('Package') {
-      steps {
-        bat 'python -m pip install --user setuptools'
-        bat 'python setup.py sdist'
-      }
-    }
-  }
-}
-post {
-  success {
-    archiveArtifacts artifacts: 'dist/*',
-      fingerprint: true
-    echo 'Python CI/CD Pipeline completed successfully!'
-  }
-  failure {
-    echo 'Pipeline failed. Check the console output.'
-  }
 }
